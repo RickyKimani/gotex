@@ -1,0 +1,6 @@
+*.pdf
+*.exe
+*.tex
+*.out
+.vscode
+.idea
