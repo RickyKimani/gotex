@@ -16,11 +16,11 @@ func (p *Parser) parseNode() Node {
 	case lexer.TokenComment:
 		return p.parseComment()
 	case lexer.TokenRBrace:
-		// Unmatched closing brace at document level
-		p.addError(UnexpectedToken, "unexpected '}' - no matching '{'", Error)
+		// Unmatched closing brace at document level - this is a warning since we can recover
+		p.addWarning(UnexpectedToken, "unexpected '}' - no matching '{'")
 		return nil
 	case lexer.TokenLBrace:
-		// Unmatched opening brace at document level
+		// Unmatched opening brace at document level - this is an error since it affects parsing
 		p.addError(UnexpectedToken, "unexpected '{' - not part of a command", Error)
 		return nil
 	default:

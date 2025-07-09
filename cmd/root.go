@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -102,7 +103,12 @@ func init() {
 }
 
 func scanTexFiles() error {
-	fmt.Println("🔍 Scanning for .tex files in current directory...")
+	// Initialize colors for scan output
+	searchColor := color.New(color.FgYellow, color.Bold)
+	numberColor := color.New(color.FgBlue, color.Bold)
+	sizeColor := color.New(color.FgGreen)
+
+	searchColor.Println("🔍 Scanning for .tex files in current directory...")
 	fmt.Println()
 
 	var texFiles []string
@@ -138,7 +144,7 @@ func scanTexFiles() error {
 		return nil
 	}
 
-	fmt.Printf("Found %d .tex file(s):\n", len(texFiles))
+	searchColor.Printf("Found %d .tex file(s):\n", len(texFiles))
 
 	// First pass: collect file info and find max widths for alignment
 	type fileInfo struct {
@@ -168,15 +174,21 @@ func scanTexFiles() error {
 		}
 	}
 
-	// Second pass: print with justified formatting
+	// Second pass: print with justified formatting and colors
 	for i, info := range fileInfos {
 		if info.err != nil {
-			fmt.Printf("  %2d. %-*s (error reading file info)\n", i+1, maxPathLen, info.path)
+			fmt.Printf("  ")
+			numberColor.Printf("%2d.", i+1)
+			fmt.Printf(" %-*s (error reading file info)\n", maxPathLen, info.path)
 			continue
 		}
 
 		sizeStr := formatBytes(info.size)
-		fmt.Printf("  %2d. %-*s %*s\n", i+1, maxPathLen, info.path, maxSizeLen, sizeStr)
+		fmt.Printf("  ")
+		numberColor.Printf("%2d.", i+1)
+		fmt.Printf(" %-*s ", maxPathLen, info.path)
+		sizeColor.Printf("%*s", maxSizeLen, sizeStr)
+		fmt.Println()
 	}
 
 	return nil

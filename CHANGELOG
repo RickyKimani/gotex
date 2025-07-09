@@ -1,0 +1,29 @@
+# Changelog
+
+## [v0.1.1] - 2025-07-09
+
+### Added
+
+- **Rust-style colorized error reporting** with severity-based color coding
+  - 🟡 Yellow warnings for recoverable issues (e.g., unmatched closing braces)
+  - 🔴 Red errors for syntax problems (e.g., missing environment closures)
+  - 🔴 Red+White fatal errors for critical parsing failures
+  - Precise error location pointers with code context
+- **Enhanced CLI filename resolution**
+  - Auto-append `.tex` extension when omitted (e.g., `gotex assignment` finds `assignment.tex`)
+  - Reject unsupported file extensions with clear error messages
+  - Improved user experience for common workflows
+- **Colorized scan output** with subtle visual improvements
+  - 🟡 Yellow headers for scan operations
+  - 🔵 Blue numbering for easier list navigation
+  - 🟢 Green file sizes for quick reference
+- **Comprehensive error classification**
+  - Warning vs Error vs Fatal severity levels
+  - Appropriate severity assignment based on error type
+  - Better error recovery and user feedback
+
+### Improved
+
+- **Error reporting system** now provides professional, developer-friendly output
+- **CLI help text** updated to reflect new filename resolution behavior
+- **Parser error handling** with proper warning/error distinction

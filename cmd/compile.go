@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/fatih/color"
 	"github.com/rickykimani/gotex/lexer"
 	"github.com/rickykimani/gotex/macro"
 	"github.com/rickykimani/gotex/parser"
@@ -14,12 +15,19 @@ import (
 
 // compileTeX compiles a .tex file to PDF
 func compileTeX(inputFile, outputFile string) error {
+	// Initialize color functions
+	successColor := color.New(color.FgGreen, color.Bold)
+	errorColor := color.New(color.FgRed, color.Bold)
+	infoColor := color.New(color.FgCyan, color.Bold)
+
 	content, err := os.ReadFile(inputFile)
 	if err != nil {
-		return fmt.Errorf("error reading file: %v", err)
+		errorColor.Print("Error: ")
+		return fmt.Errorf("reading file: %v", err)
 	}
+
 	//TODO: Remove debug logs
-	fmt.Printf("=== GoTeX Compiler ===\n")
+	infoColor.Println("=== GoTeX Compiler ===")
 	fmt.Printf("Input: %s\n", inputFile)
 	fmt.Printf("Output: %s\n\n", outputFile)
 
@@ -65,7 +73,8 @@ func compileTeX(inputFile, outputFile string) error {
 
 	generator, err := pdf.NewGenerator(ttfDir)
 	if err != nil {
-		return fmt.Errorf("error creating PDF generator: %v", err)
+		errorColor.Print("Error: ")
+		return fmt.Errorf("creating PDF generator: %v", err)
 	}
 
 	// Process the document and generate PDF
@@ -74,10 +83,13 @@ func compileTeX(inputFile, outputFile string) error {
 
 	err = generator.GeneratePDF(outputFile)
 	if err != nil {
-		return fmt.Errorf("error generating PDF: %v", err)
+		errorColor.Print("Error: ")
+		return fmt.Errorf("generating PDF: %v", err)
 	}
 
-	fmt.Printf("\n✅ PDF generated successfully: %s\n", outputFile)
+	fmt.Print("\n")
+	successColor.Print("✅ PDF generated successfully: ")
+	fmt.Printf("%s\n", outputFile)
 	fmt.Printf("📄 Pages: %d\n", generator.GetPageCount())
 
 	return nil

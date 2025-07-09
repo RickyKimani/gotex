@@ -38,3 +38,8 @@ func (p *Parser) HasFatalErrors() bool {
 	}
 	return false
 }
+
+// addWarning is a convenience function for adding warnings
+func (p *Parser) addWarning(errType ErrorType, message string) {
+	p.addError(errType, message, Warning)
+}

@@ -16,6 +16,9 @@ const (
 	UnexpectedToken
 	UnmatchedMath
 	UnexpectedEOF
+	// Warning-level issues relevant to current implementation
+
+	EmptyEnvironment
 )
 
 // ParseError represents a parsing error with recovery information

@@ -3,19 +3,34 @@ package parser
 import (
 	"fmt"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
-// ErrorReporter displays parse errors in Rust-style format
+// ErrorReporter displays parse errors in Rust-style format with colors
 type ErrorReporter struct {
 	sourceCode string
 	filename   string
+	// Color functions for different severity levels
+	warningColor  *color.Color
+	errorColor    *color.Color
+	fatalColor    *color.Color
+	filenameColor *color.Color
+	lineNumColor  *color.Color
+	pointerColor  *color.Color
 }
 
-// NewErrorReporter creates a new error reporter
+// NewErrorReporter creates a new error reporter with color support
 func NewErrorReporter(sourceCode, filename string) *ErrorReporter {
 	return &ErrorReporter{
-		sourceCode: sourceCode,
-		filename:   filename,
+		sourceCode:    sourceCode,
+		filename:      filename,
+		warningColor:  color.New(color.FgYellow, color.Bold),
+		errorColor:    color.New(color.FgRed, color.Bold),
+		fatalColor:    color.New(color.FgRed, color.Bold, color.BgWhite),
+		filenameColor: color.New(color.FgCyan),
+		lineNumColor:  color.New(color.FgBlue, color.Bold),
+		pointerColor:  color.New(color.FgRed, color.Bold),
 	}
 }
 
@@ -33,41 +48,48 @@ func (r *ErrorReporter) ReportErrors(errors []ParseError) {
 	}
 }
 
-// printError displays a single error with code context and pointer
+// printError displays a single error with code context and colorized pointer
 func (r *ErrorReporter) printError(err ParseError, lines []string) {
-	severityStr := getSeverityString(err.Severity)
+	severityStr, colorFunc := r.getSeverityStringAndColor(err.Severity)
 
-	fmt.Printf("%s: %s\n", severityStr, err.Message)
-	fmt.Printf(" --> %s:%d:%d\n", r.filename, err.Position.Line, err.Position.Column)
+	// Print colored error message
+	colorFunc.Printf("%s", severityStr)
+	fmt.Printf(": %s\n", err.Message)
+
+	// Print filename with color
+	fmt.Print(" --> ")
+	r.filenameColor.Printf("%s", r.filename)
+	fmt.Printf(":%d:%d\n", err.Position.Line, err.Position.Column)
 
 	// Ensure we have a valid line number
 	if err.Position.Line > 0 && err.Position.Line <= len(lines) {
 		line := lines[err.Position.Line-1]
 		lineNumStr := fmt.Sprintf("%d", err.Position.Line)
 
-		// Print the problematic line
-		fmt.Printf("%s | %s\n", lineNumStr, line)
+		// Print the problematic line with colored line number
+		r.lineNumColor.Printf("%s", lineNumStr)
+		fmt.Printf(" | %s\n", line)
 
-		// Print pointer to the column
+		// Print pointer to the column with color
 		padding := max(err.Position.Column-1, 0)
-
-		fmt.Printf("%s | %s^ here\n",
+		fmt.Printf("%s | %s",
 			strings.Repeat(" ", len(lineNumStr)),
 			strings.Repeat(" ", padding))
+		r.pointerColor.Printf("^ here\n")
 	}
 	fmt.Println()
 }
 
-// getSeverityString converts severity enum to display string
-func getSeverityString(s Severity) string {
+// getSeverityStringAndColor returns severity string and corresponding color function
+func (r *ErrorReporter) getSeverityStringAndColor(s Severity) (string, *color.Color) {
 	switch s {
 	case Warning:
-		return "warning"
+		return "warning", r.warningColor
 	case Error:
-		return "error"
+		return "error", r.errorColor
 	case Fatal:
-		return "fatal"
+		return "fatal", r.fatalColor
 	default:
-		return "error"
+		return "error", r.errorColor
 	}
 }

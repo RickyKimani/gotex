@@ -45,6 +45,12 @@ func (p *Parser) parseEnvironment() *Environment {
 	if !found {
 		p.addError(UnmatchedEnvironment,
 			fmt.Sprintf("Missing \\end{%s} for environment", env.Name), Error)
+	} else {
+		// Check for empty environments (warning)
+		if len(env.Body) == 0 {
+			p.addWarning(EmptyEnvironment,
+				fmt.Sprintf("Empty environment: %s", env.Name))
+		}
 	}
 
 	return env
