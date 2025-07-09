@@ -23,7 +23,6 @@ type Lexer struct {
 	posInfo Position
 }
 
-
 func (l *Lexer) readChar() {
 	if l.readPos >= len(l.input) {
 		l.ch = 0

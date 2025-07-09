@@ -47,8 +47,5 @@ func (p *Parser) parseEnvironment() *Environment {
 			fmt.Sprintf("Missing \\end{%s} for environment", env.Name), Error)
 	}
 
-	// Sync the Content field with Body for compatibility
-	env.Content = env.Body
-
 	return env
 }

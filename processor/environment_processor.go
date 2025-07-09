@@ -14,24 +14,24 @@ import (
 func (dp *DocumentProcessor) processEnvironment(env *parser.Environment, style string) {
 	switch env.Name {
 	case "document":
-		dp.processNodes(env.Content, style)
+		dp.processNodes(env.Body, style)
 
 	case "itemize":
 		dp.currentY += dp.lineHeight * 0.8
 		dp.enterList("itemize")
-		dp.processNodes(env.Content, style)
+		dp.processNodes(env.Body, style)
 		dp.exitList()
 
 	case "enumerate":
 		dp.currentY += dp.lineHeight * 0.8
 		dp.enterList("enumerate")
-		dp.processNodes(env.Content, style)
+		dp.processNodes(env.Body, style)
 		dp.exitList()
 
 	case "center":
 		// Add some space before and after
 		dp.addVerticalSpace(10)
-		dp.processNodes(env.Content, style)
+		dp.processNodes(env.Body, style)
 		dp.addVerticalSpace(10)
 
 	case "equation":
@@ -40,7 +40,7 @@ func (dp *DocumentProcessor) processEnvironment(env *parser.Environment, style s
 		dp.equationCounter++
 
 		// Extract raw text from environment content and re-parse as math
-		rawContent := dp.extractRawTextFromNodes(env.Content)
+		rawContent := dp.extractRawTextFromNodes(env.Body)
 		if strings.TrimSpace(rawContent) != "" {
 			// Calculate equation number string
 			var equationNumber string
@@ -70,7 +70,7 @@ func (dp *DocumentProcessor) processEnvironment(env *parser.Environment, style s
 		dp.addVerticalSpace(dp.lineHeight * 0.5) // Add some space after
 
 	default:
-		dp.processNodes(env.Content, style)
+		dp.processNodes(env.Body, style)
 	}
 }
 

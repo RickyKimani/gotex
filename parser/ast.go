@@ -16,7 +16,6 @@ type Command struct {
 type Environment struct {
 	Name     string
 	Body     []Node
-	Content  []Node // Alias for Body for compatibility
 	Position lexer.Position
 }
 
@@ -33,7 +32,6 @@ type MathNode struct {
 
 type Document struct {
 	Body     []Node
-	Nodes    []Node // Alias for Body for compatibility
 	Position lexer.Position
 }
 
@@ -56,7 +54,6 @@ type ArgumentPlaceholder struct {
 
 type Group struct {
 	Nodes    []Node
-	Content  []Node // Alias for Nodes for compatibility
 	Position lexer.Position
 }
 
@@ -110,7 +107,6 @@ func (m *MathFraction) Pos() lexer.Position        { return m.Position }
 func NewDocument(nodes []Node, pos lexer.Position) *Document {
 	return &Document{
 		Body:     nodes,
-		Nodes:    nodes, // Keep in sync
 		Position: pos,
 	}
 }
@@ -120,7 +116,6 @@ func NewEnvironment(name string, content []Node, pos lexer.Position) *Environmen
 	return &Environment{
 		Name:     name,
 		Body:     content,
-		Content:  content, // Keep in sync
 		Position: pos,
 	}
 }
@@ -129,7 +124,6 @@ func NewEnvironment(name string, content []Node, pos lexer.Position) *Environmen
 func NewGroup(nodes []Node, pos lexer.Position) *Group {
 	return &Group{
 		Nodes:    nodes,
-		Content:  nodes, // Keep in sync
 		Position: pos,
 	}
 }

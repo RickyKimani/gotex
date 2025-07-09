@@ -118,10 +118,10 @@ func (m *MathProcessor) renderMathSymbol(symbol *parser.MathSymbol, x, y, fontSi
 func (m *MathProcessor) renderGroup(group *parser.Group, x, y, fontSize float64) float64 {
 	currentX := x
 
-	for i, node := range group.Content {
+	for i, node := range group.Nodes {
 		// Add spacing between elements if needed
 		if i > 0 {
-			currentX += m.getSpacing(group.Content[i-1], node)
+			currentX += m.getSpacing(group.Nodes[i-1], node)
 		}
 
 		width := m.renderMathElement(node, currentX, y, fontSize)

@@ -17,13 +17,14 @@ var (
 var rootCmd = &cobra.Command{
 	Use:   "gotex [input.tex]",
 	Short: "GoTeX - A Go-based TeX to PDF compiler",
-	Long: `GoTeX is a TeX to PDF compiler written in Go that provides robust error handling
+	Long: `GoTeX is a TeX to PDF compiler written in Go
 and LaTeX-like compilation capabilities.
 
 Examples:
-  gotex document.tex                    # Compile to document.pdf
+  gotex document.tex                    # Compile document.tex to document.pdf
   gotex document.tex -o report.pdf     # Compile to custom output name
-  gotex --scan                         # Scan current directory for .tex files`,
+  gotex assignment                      # Compile assignment.tex (if it exists)
+  gotex --scan                          # Scan current directory for .tex files`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		// no arguments are needed for scan
 		if scanMode {
@@ -35,14 +36,27 @@ Examples:
 			return fmt.Errorf("requires exactly one .tex file argument")
 		}
 
-		// Validate that the file has .tex extension
-		if !strings.HasSuffix(strings.ToLower(args[0]), ".tex") {
-			return fmt.Errorf("input file must have .tex extension")
+		inputArg := args[0]
+
+		// Check if the argument has .tex extension
+		if strings.HasSuffix(strings.ToLower(inputArg), ".tex") {
+			// Check if file exists
+			if _, err := os.Stat(inputArg); os.IsNotExist(err) {
+				return fmt.Errorf("file '%s' does not exist", inputArg)
+			}
+			return nil
 		}
 
-		// Check if file exists
-		if _, err := os.Stat(args[0]); os.IsNotExist(err) {
-			return fmt.Errorf("file '%s' does not exist", args[0])
+		// If no .tex extension, check for other extensions and reject them
+		if strings.Contains(inputArg, ".") {
+			ext := filepath.Ext(inputArg)
+			return fmt.Errorf("unsupported file extension '%s'. GoTeX only processes .tex files", ext)
+		}
+
+		// No extension provided - try to find inputArg.tex
+		texFilePath := inputArg + ".tex"
+		if _, err := os.Stat(texFilePath); os.IsNotExist(err) {
+			return fmt.Errorf("%s not found in current directory", texFilePath)
 		}
 
 		return nil
@@ -54,18 +68,27 @@ Examples:
 
 		inputFile := args[0]
 
+		// If input doesn't have .tex extension, append .tex
+		if !strings.HasSuffix(strings.ToLower(inputFile), ".tex") {
+			inputFile = inputFile + ".tex"
+		}
+
 		// Determine output file name
 		if outputFile == "" {
 			// Use base name of input file with .pdf extension
 			base := strings.TrimSuffix(inputFile, filepath.Ext(inputFile))
 			outputFile = base + ".pdf"
+		} else {
+			// Clean up the output file name:
+			// 1. Remove any existing .pdf extension to avoid double extensions
+			// 2. Then add .pdf extension
+			outputFile = strings.TrimSuffix(outputFile, ".pdf") + ".pdf"
 		}
 
 		return compileTeX(inputFile, outputFile)
 	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -78,7 +101,6 @@ func init() {
 	rootCmd.Flags().BoolVarP(&scanMode, "scan", "s", false, "Scan current directory for .tex files")
 }
 
-// scanTexFiles recursively scans the current directory for .tex files
 func scanTexFiles() error {
 	fmt.Println("🔍 Scanning for .tex files in current directory...")
 	fmt.Println()
@@ -160,16 +182,19 @@ func scanTexFiles() error {
 	return nil
 }
 
-// ls lol
 func formatBytes(bytes int64) string {
 	const unit = 1024
 	if bytes < unit {
 		return fmt.Sprintf("%d B", bytes)
 	}
+
+	units := []string{"K", "M", "G"}
+
 	div, exp := int64(unit), 0
 	for n := bytes / unit; n >= unit; n /= unit {
 		div *= unit
 		exp++
 	}
-	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
+
+	return fmt.Sprintf("%.1f %sB", float64(bytes)/float64(div), units[exp])
 }

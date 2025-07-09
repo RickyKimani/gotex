@@ -33,7 +33,7 @@ func NewTypesetter(lineWidth float64) *Typesetter {
 func (ts *Typesetter) TypesetDocument(doc *parser.Document) [][]*Box {
 	ts.Lines = make([][]*Box, 0)
 
-	for _, node := range doc.Nodes {
+	for _, node := range doc.Body {
 		boxes := ts.TypesetNode(node)
 		lines := ts.LineBreak.BreakParagraph(boxes)
 		ts.Lines = append(ts.Lines, lines...)
@@ -127,7 +127,7 @@ func (ts *Typesetter) TypesetEnvironment(env *parser.Environment) []*Box {
 	boxes := make([]*Box, 0)
 
 	// For now, just typeset the content
-	for _, node := range env.Content {
+	for _, node := range env.Body {
 		nodeBoxes := ts.TypesetNode(node)
 		boxes = append(boxes, nodeBoxes...)
 	}
@@ -181,7 +181,7 @@ func (ts *Typesetter) TypesetMathNode(mathNode *parser.MathNode) []*Box {
 func (ts *Typesetter) TypesetGroup(group *parser.Group) []*Box {
 	boxes := make([]*Box, 0)
 
-	for _, node := range group.Content {
+	for _, node := range group.Nodes {
 		nodeBoxes := ts.TypesetNode(node)
 		boxes = append(boxes, nodeBoxes...)
 	}

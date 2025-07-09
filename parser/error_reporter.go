@@ -49,7 +49,7 @@ func (r *ErrorReporter) printError(err ParseError, lines []string) {
 		fmt.Printf("%s | %s\n", lineNumStr, line)
 
 		// Print pointer to the column
-		padding := max(err.Position.Column - 1, 0)
+		padding := max(err.Position.Column-1, 0)
 
 		fmt.Printf("%s | %s^ here\n",
 			strings.Repeat(" ", len(lineNumStr)),

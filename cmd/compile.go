@@ -34,7 +34,6 @@ func compileTeX(inputFile, outputFile string) error {
 	p := parser.NewParser(tokens)
 	doc, errors := p.Parse()
 
-	// Show any parse errors using Rust-style error reporting
 	if len(errors) > 0 {
 		reporter := parser.NewErrorReporter(string(content), inputFile)
 		reporter.ReportErrors(errors)
@@ -47,7 +46,7 @@ func compileTeX(inputFile, outputFile string) error {
 
 	expander := macro.NewExpander(store)
 	expandedDoc := expander.ExpandDocument(doc)
-	fmt.Printf("Document expanded: %d nodes\n", len(expandedDoc.Nodes))
+	fmt.Printf("Document expanded: %d nodes\n", len(expandedDoc.Body))
 
 	// Generate PDF
 	fmt.Println("\nStep 4: Generating PDF...")
@@ -71,7 +70,7 @@ func compileTeX(inputFile, outputFile string) error {
 
 	// Process the document and generate PDF
 	docProcessor := processor.NewDocumentProcessor(generator)
-	docProcessor.ProcessDocument(expandedDoc.Nodes)
+	docProcessor.ProcessDocument(expandedDoc.Body)
 
 	err = generator.GeneratePDF(outputFile)
 	if err != nil {

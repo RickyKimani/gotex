@@ -1,6 +1,8 @@
 package math
 
 import (
+	"math"
+
 	"github.com/rickykimani/gotex/parser"
 	"github.com/rickykimani/gotex/symbols"
 )
@@ -44,10 +46,29 @@ func (m *MathProcessor) calculateElementWidth(node parser.Node, fontSize float64
 
 	case *parser.Group:
 		totalWidth := 0.0
-		for _, node := range n.Content {
+		for _, node := range n.Nodes {
 			totalWidth += m.calculateElementWidth(node, fontSize)
 		}
 		return totalWidth
+
+	case *parser.MathFraction:
+		// For fractions, return the width of the wider element
+		numWidth := m.calculateElementWidth(n.Numerator, fontSize*0.7)
+		denWidth := m.calculateElementWidth(n.Denominator, fontSize*0.7)
+		return math.Max(numWidth, denWidth)
+
+	case *parser.MathSuperscript:
+		baseWidth := m.calculateElementWidth(n.Base, fontSize)
+		expWidth := m.calculateElementWidth(n.Exponent, fontSize*0.7)
+		return baseWidth + expWidth*0.8 // Superscript adds to width
+
+	case *parser.MathSubscript:
+		baseWidth := m.calculateElementWidth(n.Base, fontSize)
+		subWidth := m.calculateElementWidth(n.Index, fontSize*0.7)
+		return baseWidth + subWidth*0.8 // Subscript adds to width
+
+	case *parser.MathSymbol:
+		return m.generator.GetTextWidth(n.Symbol, fontSize, "normal")
 
 	default:
 		// Default approximation

@@ -49,19 +49,64 @@ func (p *Parser) parseMathExpression(text string, startPos int, tokenPos lexer.P
 			}
 
 		case '\\':
-			// Handle LaTeX commands like \alpha
+			// Handle LaTeX commands like \alpha or \frac
 			cmdStart := pos + 1
 			pos++
 			for pos < len(text) && isAlpha(text[pos]) {
 				pos++
 			}
 			cmdName := text[cmdStart:pos]
+
 			if symbol, exists := symbols.ConvertMathSymbol(cmdName); exists {
 				nodes = append(nodes, &MathSymbol{Symbol: symbol, Command: cmdName, Position: tokenPos})
 			} else {
-				// For now, unknown commands are just stored by name.
-				// A fuller implementation might parse arguments.
-				nodes = append(nodes, &Command{Name: cmdName, Position: tokenPos})
+				// Handle commands that might have arguments
+				switch cmdName {
+				case "frac":
+					// Parse two arguments for fraction
+					if pos < len(text) && text[pos] == '{' {
+						numerator, newPos := p.parseBracedMathExpression(text, pos, tokenPos)
+						pos = newPos
+
+						if pos < len(text) && text[pos] == '{' {
+							denominator, newPos := p.parseBracedMathExpression(text, pos, tokenPos)
+							pos = newPos
+
+							nodes = append(nodes, &MathFraction{
+								Numerator:   numerator,
+								Denominator: denominator,
+								Position:    tokenPos,
+							})
+						} else {
+							// Missing second argument, treat as regular command
+							nodes = append(nodes, &Command{Name: cmdName, Position: tokenPos})
+							if numerator != nil {
+								nodes = append(nodes, numerator)
+							}
+						}
+					} else {
+						// Missing arguments, treat as regular command
+						nodes = append(nodes, &Command{Name: cmdName, Position: tokenPos})
+					}
+				case "sqrt":
+					// Parse one argument for square root
+					if pos < len(text) && text[pos] == '{' {
+						argument, newPos := p.parseBracedMathExpression(text, pos, tokenPos)
+						pos = newPos
+
+						nodes = append(nodes, &Command{
+							Name:     cmdName,
+							Args:     []Node{argument},
+							Position: tokenPos,
+						})
+					} else {
+						// Missing argument, treat as regular command
+						nodes = append(nodes, &Command{Name: cmdName, Position: tokenPos})
+					}
+				default:
+					// For other unknown commands, just store by name
+					nodes = append(nodes, &Command{Name: cmdName, Position: tokenPos})
+				}
 			}
 
 		default:
@@ -120,7 +165,7 @@ func (p *Parser) parseBracedMathExpression(text string, startPos int, tokenPos l
 		// This is an error recovery strategy.
 		content := text[contentStart:]
 		parsedContent, _ := p.parseMathExpression(content, 0, tokenPos)
-		return &Group{Content: parsedContent, Position: tokenPos}, len(text)
+		return &Group{Nodes: parsedContent, Position: tokenPos}, len(text)
 	}
 
 	// Recursively parse the content within the braces
@@ -135,7 +180,7 @@ func (p *Parser) parseBracedMathExpression(text string, startPos int, tokenPos l
 		return parsedContent[0], pos
 	}
 
-	return &Group{Content: parsedContent, Position: tokenPos}, pos
+	return &Group{Nodes: parsedContent, Position: tokenPos}, pos
 }
 
 // isMathSpecialChar checks for characters that have special meaning in our math parser.

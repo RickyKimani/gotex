@@ -47,15 +47,15 @@ func (f *Font) GetCharWidth(char rune) float64 {
 	case 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X', 'Y', 'Z':
 		return baseWidth * 1.2
 	case '.', ',', ':', ';', '!', '|':
-		return baseWidth * 0.3 
+		return baseWidth * 0.3
 	case '-', '=', '+':
-		return baseWidth * 0.7 
+		return baseWidth * 0.7
 	case '(', ')', '[', ']', '{', '}':
-		return baseWidth * 0.4 
+		return baseWidth * 0.4
 	case '"', '\'':
-		return baseWidth * 0.3 
+		return baseWidth * 0.3
 	default:
-		return baseWidth 
+		return baseWidth
 	}
 }
 
