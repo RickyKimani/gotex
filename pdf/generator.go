@@ -146,6 +146,9 @@ func (g *Generator) AddLine(x1, y1, x2, y2 float64) {
 	pdfY1 := g.PageHeight - y1
 	pdfY2 := g.PageHeight - y2
 
+	// Set stroke properties to make the line visible
+	g.pdf.SetStrokeColor(0, 0, 0) // Black
+	g.pdf.SetLineWidth(0.5)       // Thin line
 	g.pdf.Line(x1, pdfY1, x2, pdfY2)
 }
 

@@ -46,7 +46,11 @@ func (m *MathProcessor) calculateElementWidth(node parser.Node, fontSize float64
 
 	case *parser.Group:
 		totalWidth := 0.0
-		for _, node := range n.Nodes {
+		for i, node := range n.Nodes {
+			// Add spacing between elements if needed
+			if i > 0 {
+				totalWidth += m.getSpacing(n.Nodes[i-1], node)
+			}
 			totalWidth += m.calculateElementWidth(node, fontSize)
 		}
 		return totalWidth

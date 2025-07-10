@@ -64,7 +64,6 @@ var MathSymbolTable = map[string]string{
 	"partial": "∂",
 	"infty":   "∞",
 	"nabla":   "∇",
-	"sqrt":    "√",
 	"pm":      "±",
 	"mp":      "∓",
 	"times":   "×",

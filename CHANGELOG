@@ -1,5 +1,24 @@
 # Changelog
 
+## [v0.1.2] - 2025-07-10
+
+### Added
+
+- **Vinculum rendering for square roots** - Square root expressions now display with proper horizontal bars above the radicand
+
+### Fixed
+
+- **Square root rendering** - Braces `{}` are now correctly parsed as groups instead of plain text
+- **Fraction bar length** - Fraction bars now properly extend to cover the last operand in complex expressions
+
+### Known Issues
+
+- **Braced expressions in equation environments** - Superscripts and subscripts with braces (e.g., `x^{ab}`, `a_{xy}`) in equation environments still trigger parsing errors
+
+### Removed
+
+- **sqrt symbol** - Removed from symbols map to prevent conflicts with proper square root command handling
+
 ## [v0.1.1] - 2025-07-09
 
 ### Added

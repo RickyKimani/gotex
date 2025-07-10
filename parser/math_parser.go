@@ -48,6 +48,12 @@ func (p *Parser) parseMathExpression(text string, startPos int, tokenPos lexer.P
 				nodes = append(nodes, &MathSubscript{Base: base, Index: scriptContent, Position: tokenPos})
 			}
 
+		case '{':
+			// Handle braced expressions
+			bracedContent, newPos := p.parseBracedMathExpression(text, pos, tokenPos)
+			pos = newPos
+			nodes = append(nodes, bracedContent)
+
 		case '\\':
 			// Handle LaTeX commands like \alpha or \frac
 			cmdStart := pos + 1
@@ -185,7 +191,7 @@ func (p *Parser) parseBracedMathExpression(text string, startPos int, tokenPos l
 
 // isMathSpecialChar checks for characters that have special meaning in our math parser.
 func isMathSpecialChar(char byte) bool {
-	return char == '^' || char == '_' || char == '\\'
+	return char == '^' || char == '_' || char == '\\' || char == '{' || char == '}'
 }
 
 // isAlpha checks if a character is a letter.
