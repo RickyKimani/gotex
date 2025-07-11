@@ -7,7 +7,9 @@ func (p *Parser) parseArgumentWithStartPos(startPos lexer.Position) Node {
 	var nodes []Node
 
 	for p.curToken.Type != lexer.TokenRBrace && p.curToken.Type != lexer.TokenEOF {
-		node := p.parseNode()
+		// Use math environment parsing if we're in a math context
+		// This allows braces to be parsed correctly inside command arguments
+		node := p.parseMathEnvironmentNode()
 		if node != nil {
 			nodes = append(nodes, node)
 		}

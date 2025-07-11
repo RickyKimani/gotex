@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.1.3] - 2025-07-11
+
+### Fixed
+
+- **Braced expressions in equation environments** - Superscripts and subscripts with braces (e.g., `x^{ab}`, `a_{xy}`) now parse correctly without errors in equation environments
+- **Vinculum positioning** - Square root horizontal bars now align more precisely with the radical symbol
+
 ## [v0.1.2] - 2025-07-10
 
 ### Added

@@ -4,8 +4,6 @@ import "github.com/rickykimani/gotex/parser"
 
 //TODO: Implement different radicals
 
-//TODO: Make sure the radical covers the width of operand (\radical{})
-
 // renderSquareRoot renders square root symbols with proper vinculum
 func (mp *MathProcessor) renderSquareRoot(arg parser.Node, x, y, fontSize float64) float64 {
 	// Render the square root symbol
@@ -20,7 +18,8 @@ func (mp *MathProcessor) renderSquareRoot(arg parser.Node, x, y, fontSize float6
 
 	// Draw the vinculum (horizontal line) above the radicand
 	// Position it at the top of the radical symbol (above the baseline)
-	vinculumY := y + fontSize*0.85 // Position slightly lower for better alignment
+	//TODO: Implement precise font height and multipliers to avoid hard coded values
+	vinculumY := y + fontSize*0.8
 	vinculumStartX := x + symbolWidth
 	vinculumEndX := x + symbolWidth + argWidth
 

@@ -90,9 +90,11 @@ func (dp *DocumentProcessor) extractRawMathText(node parser.Node) string {
 		return n.Value
 	case *parser.Group:
 		var result strings.Builder
+		result.WriteString("{")
 		for _, child := range n.Nodes {
 			result.WriteString(dp.extractRawMathText(child))
 		}
+		result.WriteString("}")
 		return result.String()
 	case *parser.Command:
 		// Preserve the command with backslash for math processing
